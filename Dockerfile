@@ -18,5 +18,5 @@ RUN pip install -r requirements.txt
 # Copy all files
 COPY . .
 
-# Command to run the app
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "${PORT:-8000}"]
+# Use shell form to allow environment variable substitution
+CMD uvicorn main:app --host 0.0.0.0 --port $PORT
