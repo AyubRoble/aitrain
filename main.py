@@ -1,9 +1,21 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from pydantic import BaseModel
-from recommendation_engine import WebtoonRecommender
+from recommendation_engine import RecommendationEngine
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
-recommender = WebtoonRecommender()
+
+# CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Initialize the recommendation engine
+engine = RecommendationEngine()
 
 class Query(BaseModel):
     query: str
@@ -16,14 +28,8 @@ def read_root():
 async def recommend(query: Query):
     try:
         print("Starting recommendation process...")
-        import numpy as np  # Try importing here to see specific error
-        print("Numpy imported successfully")
-        
         recommendations = engine.get_recommendations(query.query)
         return {"status": "success", "recommendations": recommendations}
-    except ImportError as e:
-        print(f"Import Error details: {str(e)}")
-        return {"status": "error", "message": f"Detailed Import Error: {str(e)}"}
     except Exception as e:
         print(f"General Error details: {str(e)}")
-        return {"status": "error", "message": f"Detailed Error: {str(e)}"}
+        return {"status": "error", "message": f"Error: {str(e)}"}
